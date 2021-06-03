@@ -5,6 +5,11 @@
 #include "funshield.h"
 #include "timing.h"
 
+
+/**
+ * Button
+ *  - basic button class. isPressed returns true/false based on current state of button
+ */
 class Button{
   const uint8_t pin;
 public:
@@ -19,12 +24,19 @@ public:
 };
 
 
-
+/**
+ * TimedButton
+ *  - all the time the button is pressed withnin a certain interval since last press will be ignored
+ */
 class TimedButton : public Button{
   Timer<> cooldown;
 public:
   TimedButton(uint8_t pin, uint16_t cd) : Button(pin), cooldown(cd)
   {}
+  void init(){
+    Button::init();
+    cooldown.init();
+  }
   bool isPressed(){
     if (Button::isPressed() && cooldown.elapsed()){
       cooldown.reset();
@@ -36,6 +48,10 @@ public:
 
 
 
+/**
+ * EventButton
+ *  - has press down and press up events - these happen for one update call after button is pressed/unpressed
+ */
 class EventButton : public Button{
   uint8_t data;
   static constexpr uint8_t WAS_PRESSED = 0x1;
@@ -94,6 +110,12 @@ private:
 };
 
 
+
+/**
+ * DoublyTimedButton
+ *  - Similar to timed button, however, interval changes after first repetition
+ *  - behaviour is similar to pc keyboard keys, first key press writes one character, but holding the key for an extended period of time writes many at once
+ */
 class DoublyTimedButton : public Button{
   enum PressState{
     NOT_PRESSED,
@@ -105,6 +127,11 @@ class DoublyTimedButton : public Button{
 public:
   DoublyTimedButton(uint8_t pin, uint16_t cd_first, uint16_t cd) : Button(pin), timer_first(cd_first), timer_later(cd)
   {}
+  void init(){
+    Button::init();
+    timer_first.init();
+    timer_later.init();
+  }
   bool isPressed(){
     if (Button::isPressed()){
       if (state == NOT_PRESSED){

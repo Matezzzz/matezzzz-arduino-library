@@ -2,13 +2,17 @@
 #define LED_H
 
 #include "funshield.h"
-
+/**
+ * LED
+ *  - controls one LED on the given pin
+ */
 class LED{
   const uint8_t pin;
 public:
   LED(uint8_t p) : pin(p)
-  {
-    pinMode(p, OUTPUT);
+  {}
+  void init(){
+    pinMode(pin, OUTPUT);
   }
   void turnOn() const{
     digitalWrite(pin, ON);

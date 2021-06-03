@@ -6,6 +6,7 @@
 
 const int DIGIT_NONE = 10;
 const int DIGIT_d = 11;
+//digits 0-9, then blank space, then letter d
 constexpr uint8_t extended_digits[]{ 0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8, 0x80, 0x90, 0xff, 0xa1};
 
 constexpr uint8_t segment_display_pins[]{latch_pin, data_pin, clock_pin};
@@ -17,6 +18,7 @@ class SegmentDisplay{
   uint8_t pins[3];
   uint8_t current_digit = 0;
 protected:
+  //current state of display - one bit for each segment or/off
   uint8_t seg_state[4];
 public:
   SegmentDisplay(const uint8_t p[3] = segment_display_pins) : pins{p[0], p[1], p[2]}
@@ -27,8 +29,8 @@ public:
     for (uint8_t pin : pins) pinMode(pin, OUTPUT);
   }
   void update(){
-    writeSegment(current_digit++);
-    current_digit %= 4;
+    writeSegment(current_digit);
+    current_digit = (current_digit + 1) % 4;
   }
   void writeSegment(uint8_t segment){
     digitalWrite(pins[LATCH], LOW);
