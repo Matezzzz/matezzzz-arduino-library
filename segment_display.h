@@ -15,20 +15,24 @@ constexpr uint8_t segment_display_pins[]{latch_pin, data_pin, clock_pin};
 class SegmentDisplay{
   enum PINS{LATCH, DATA, CLOCK};
   uint8_t pins[3];
+  uint8_t current_digit = 0;
 protected:
-  uint8_t state[4];
+  uint8_t seg_state[4];
 public:
   SegmentDisplay(const uint8_t p[3] = segment_display_pins) : pins{p[0], p[1], p[2]}
   {
+    for (int i = 0; i < 4; i++) seg_state[i] = 0xFF;
+  }
+  void init(){
     for (uint8_t pin : pins) pinMode(pin, OUTPUT);
-    for (int i = 0; i < 4; i++) state[i] = 0xFF;
   }
   void update(){
-    for (uint8_t i = 0; i < 4; i++) writeSegment(i);
+    writeSegment(current_digit++);
+    current_digit %= 4;
   }
   void writeSegment(uint8_t segment){
     digitalWrite(pins[LATCH], LOW);
-    shiftOut(pins[DATA], pins[CLOCK], MSBFIRST, state[segment]);
+    shiftOut(pins[DATA], pins[CLOCK], MSBFIRST, seg_state[segment]);
     shiftOut(pins[DATA], pins[CLOCK], MSBFIRST, 1 << segment);
     digitalWrite(pins[LATCH], HIGH);
   }
@@ -36,7 +40,7 @@ public:
 
 
 
-
+template<bool leading_zeroes=false>
 class NumberSegmentDisplay : public SegmentDisplay{
 public:
   NumberSegmentDisplay(uint16_t n = 0, const uint8_t p[3] = segment_display_pins) : SegmentDisplay(p)
@@ -44,7 +48,7 @@ public:
     setNumber(n);
   }
   void setNumber(uint16_t n){
-    setSegments((n < 1000) ? DIGIT_NONE : (n / 1000), (n < 100) ? DIGIT_NONE : (n / 100 % 10), (n < 10) ? DIGIT_NONE : (n / 10 % 10), n % 10);
+    setSegments((n < 1000) ? emptyDigit() : (n / 1000), (n < 100) ? emptyDigit() : (n / 100 % 10), (n < 10) ? emptyDigit() : (n / 10 % 10), n % 10);
   }
   void setSegments(uint8_t a, uint8_t b, uint8_t c, uint8_t d){
     setSegNumber(0, a);
@@ -53,7 +57,11 @@ public:
     setSegNumber(3, d);
   }
   void setSegNumber(uint8_t seg, uint8_t n){
-    state[seg] = extended_digits[n];
+    seg_state[seg] = extended_digits[n];
+  }
+private:
+  constexpr static uint8_t emptyDigit(){
+    return leading_zeroes ? 0 : DIGIT_NONE;
   }
 };
 

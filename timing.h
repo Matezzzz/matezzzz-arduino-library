@@ -3,24 +3,25 @@
 
 #include "funshield.h"
 
+template<typename time_unit = uint16_t>
 class Stopwatch{
-  uint16_t timer_start;
+  time_unit timer_start;
 public:
   Stopwatch() : timer_start(millis())
   {}
-  inline uint16_t elapsedTime(){
+  time_unit elapsedTime(){
     return millis() - timer_start;
   }
-  inline void reset(){
+  void reset(){
     timer_start = millis();
   }
 };
 
-
-class Timer : public Stopwatch{
-  uint16_t timer_length;
+template<typename time_unit = uint16_t>
+class Timer : public Stopwatch<time_unit>{
+  time_unit timer_length;
 public:
-  Timer(uint16_t length = 0) : timer_length(length)
+  Timer(time_unit length = 0) : timer_length(length)
   {}
   bool update(){
     if (elapsed()){

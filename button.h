@@ -9,8 +9,9 @@ class Button{
   const uint8_t pin;
 public:
   Button(uint8_t p) : pin(p)
-  {
-    pinMode(p, INPUT);  
+  {}
+  void init(){
+    pinMode(pin, INPUT);
   }
   bool isPressed(){
     return !digitalRead(pin);
@@ -41,11 +42,12 @@ class EventButton : public Button{
   static constexpr uint8_t PRESS_DOWN = 0x2;
   static constexpr uint8_t PRESS_UP = 0x4;
 public:
-  EventButton(uint8_t pin) : Button(pin)
+  EventButton(uint8_t pin) : Button(pin), data(0)
   {}
   
   void update(){
     bool pressed = isPressed();
+
     if (pressed){
       if (getBool<WAS_PRESSED>()){
         clearBool<PRESS_DOWN>();
@@ -70,7 +72,7 @@ public:
 private:
   template<uint8_t mask>
   inline bool getBool(){
-    return (data | mask);
+    return (data & mask);
   }
   template<uint8_t mask>
   inline void setBool(){
