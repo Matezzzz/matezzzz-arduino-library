@@ -21,7 +21,7 @@ public:
 
 
 class TimedButton : public Button{
-  Timer cooldown;
+  Timer<> cooldown;
 public:
   TimedButton(uint8_t pin, uint16_t cd) : Button(pin), cooldown(cd)
   {}
@@ -100,8 +100,8 @@ class DoublyTimedButton : public Button{
     PRESSED_FIRST,
     PRESSED_LATER
   } state = NOT_PRESSED;
-  Timer timer_first;
-  Timer timer_later;
+  Timer<> timer_first;
+  Timer<> timer_later;
 public:
   DoublyTimedButton(uint8_t pin, uint16_t cd_first, uint16_t cd) : Button(pin), timer_first(cd_first), timer_later(cd)
   {}

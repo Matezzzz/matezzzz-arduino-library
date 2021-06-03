@@ -24,14 +24,14 @@ public:
   Timer(time_unit length = 0) : timer_length(length)
   {}
   bool update(){
-    if (elapsed()){
-      reset();
+    if (this->elapsed()){
+      this->reset();
       return true;
     }
     return false;
   }
   bool elapsed(){
-    return elapsedTime() >= timer_length;
+    return this->elapsedTime() >= timer_length;
   }
 };
 

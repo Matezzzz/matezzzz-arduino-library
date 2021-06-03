@@ -64,15 +64,18 @@ private:
   }
 };
 
+
+
+
 template<int snake_count, int snake_length>
 class AnimatedSegmentDisplay : public SegmentDisplay{
   AnimatedSnake<snake_length> snakes[snake_count];
-  Timer timer;
+  Timer<> timer;
 public:
   AnimatedSegmentDisplay(uint16_t move_period) : timer(move_period)
   {}
   void update(){
-    if (timer.update()) for (int i = 0; i < snake_count; i++) snakes[i].move(state);
+    if (timer.update()) for (int i = 0; i < snake_count; i++) snakes[i].move(seg_state);
     SegmentDisplay::update();
   }
 };
